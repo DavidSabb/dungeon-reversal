@@ -11,6 +11,10 @@ public class PlayerCombat : MonoBehaviour
     public LayerMask enemyLayer;
     public string enemyTag = "Hero";
 
+    [Header("Weapon Hit (Melee)")]
+    public Transform weaponTip;            // drag the club bone here; if null, falls back to a point in front of the troll
+    public float     weaponHitRadius = 3.5f;
+
     [Header("Special Attack 1 - Shockwave (E)")]
     public float special1Damage   = 60f;
     public float special1Range    = 5f;
@@ -68,9 +72,21 @@ public class PlayerCombat : MonoBehaviour
         _anim.SetTrigger(HashAttack);
         PlaySound(meleeSwingClip);
         yield return new WaitForSeconds(0.45f);
-        HitInCone(meleeDamage, meleeRange, meleeAngle);
+        HitAtWeapon(meleeDamage, weaponHitRadius);
         yield return new WaitForSeconds(0.55f);
         IsAttacking = false;
+    }
+
+    private void HitAtWeapon(float dmg, float radius)
+    {
+        Vector3 origin = weaponTip != null
+            ? weaponTip.position
+            : transform.position + transform.forward * meleeRange;
+
+        foreach (Collider col in Physics.OverlapSphere(origin, radius, enemyLayer))
+        {
+            if (col.CompareTag(enemyTag)) Hit(col, dmg);
+        }
     }
 
     private IEnumerator DoSpecial1()
@@ -102,11 +118,15 @@ public class PlayerCombat : MonoBehaviour
 
     private void HitInCone(float dmg, float range, float angle)
     {
+        Vector3 forward = transform.forward; forward.y = 0f; forward.Normalize();
         foreach (Collider col in Physics.OverlapSphere(transform.position, range, enemyLayer))
         {
             if (!col.CompareTag(enemyTag)) continue;
-            Vector3 dir = (col.transform.position - transform.position).normalized;
-            if (Vector3.Angle(transform.forward, dir) <= angle * 0.5f)
+            Vector3 dir = col.transform.position - transform.position;
+            dir.y = 0f;
+            if (dir.sqrMagnitude < 0.0001f) { Hit(col, dmg); continue; }
+            dir.Normalize();
+            if (Vector3.Angle(forward, dir) <= angle * 0.5f)
                 Hit(col, dmg);
         }
     }
@@ -145,5 +165,14 @@ public class PlayerCombat : MonoBehaviour
     private void PlaySound(AudioClip clip)
     {
         if (clip != null && _audio != null) _audio.PlayOneShot(clip);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1f, 0.5f, 0f, 0.6f);
+        Vector3 origin = weaponTip != null
+            ? weaponTip.position
+            : transform.position + transform.forward * meleeRange;
+        Gizmos.DrawWireSphere(origin, weaponHitRadius);
     }
 }

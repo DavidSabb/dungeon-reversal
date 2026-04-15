@@ -106,9 +106,10 @@ GameObject:
   - component: {fileID: 1526141377349667582}
   - component: {fileID: 4618433468183601901}
   - component: {fileID: 8340473171046618273}
+  - component: {fileID: 8800123456789012345}
   m_Layer: 0
   m_Name: CaveTroll
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -138,8 +139,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5265410526906196221}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: 34bf333920b9886469ea633c17e22d4d, type: 3}
+  m_Controller: {fileID: 9100000, guid: 50e102f778e6d854bb51845cca9dbe04, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -167,8 +168,10 @@ MonoBehaviour:
   meleeAngle: 90
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   enemyTag: Hero
+  weaponTip: {fileID: 3722318324498243072}
+  weaponHitRadius: 4
   special1Damage: 60
   special1Range: 5
   special1Cooldown: 5
@@ -223,10 +226,10 @@ MonoBehaviour:
   runSpeed: 6
   gravity: -20
   jumpHeight: 1.5
-  cameraTransform: {fileID: 0}
+  cameraTransform: {fileID: 1862850082427278693}
   mouseSensitivity: 2
-  pitchMin: -40
-  pitchMax: 60
+  pitchMin: -5
+  pitchMax: 30
 --- !u!114 &8340473171046618273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,6 +250,25 @@ MonoBehaviour:
   phase2Clip: {fileID: 0}
   deathDelay: 2
   deathClip: {fileID: 0}
+--- !u!114 &8800123456789012345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5265410526906196221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b2c4d6e1f3a5b7c9d8e0f2a4b6c8d10, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  playerHealth: {fileID: 0}
+  playerCombat: {fileID: 0}
+  healthColor: {r: 0.85, g: 0.15, b: 0.15, a: 1}
+  healthBackground: {r: 0, g: 0, b: 0, a: 0.7}
+  readyColor: {r: 0.2, g: 0.85, b: 0.2, a: 1}
+  cooldownColor: {r: 0.4, g: 0.4, b: 0.4, a: 1}
+  textColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &3727018768954005008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -265,7 +287,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4876443625621520, guid: 4a2995c2dfa5ee447bb99406df3fd57e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.4737387e-17
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4876443625621520, guid: 4a2995c2dfa5ee447bb99406df3fd57e, type: 3}
       propertyPath: m_LocalPosition.z

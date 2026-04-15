@@ -29,6 +29,11 @@ public class HeroHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
+    public void ResetToMax()
+    {
+        currentHealth = maxHealth;
+    }
+
     public void TakeDamage(float amount)
     {
         if (_isDead) return;
