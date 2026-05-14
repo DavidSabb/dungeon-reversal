@@ -688,7 +688,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.69411767}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2366,6 +2366,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3728868621665356884, guid: b030bae241d675d4a8b664b10094853c, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 5265410526906196221, guid: b030bae241d675d4a8b664b10094853c, type: 3}
       propertyPath: m_Name
       value: CaveTroll
@@ -4254,17 +4258,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8a21b5fb4288db45a1d57d6194d2506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wave1Heroes: 2
-  wave2Heroes: 3
-  wave3Heroes: 4
-  timeBetweenWaves: 6
-  startDelay: 3
-  timeBetweenSpawns: 1
-  dmgPerWave: 0.45
-  hpPerWave: 0.55
-  speedPerWave: 0.2
-  reactCutPerWave: 0.25
-  cdCutPerWave: 0.18
   bannerDuration: 2.5
   wave1Color: {r: 0.6, g: 1, b: 0.6, a: 1}
   wave2Color: {r: 1, g: 0.85, b: 0.4, a: 1}
@@ -4291,11 +4284,6 @@ MonoBehaviour:
   startDelay: 2
   autoSpawnRadius: 18
   autoSpawnMinDist: 12
-  damageScalePerWave: 0.45
-  healthScalePerWave: 0.55
-  speedScalePerWave: 0.12
-  reactReductionPerWave: 0.18
-  cooldownReductionPerWave: 0.12
   scorePerKill: 100
 --- !u!1001 &853106487
 PrefabInstance:
