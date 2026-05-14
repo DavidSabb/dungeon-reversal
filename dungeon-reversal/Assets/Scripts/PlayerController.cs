@@ -4,42 +4,37 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
     public float walkSpeed = 5f;
-    public float runSpeed  = 10f;
-    public float gravity   = -20f;
-
-    [Header("Jump")]
+    public float runSpeed = 10f;
+    public float gravity = -20f;
     public float jumpHeight = 2f;
 
-    [Header("Mouse Look")]
-    public Transform cameraTransform;   // drag your Camera child here in Inspector
+    public Transform cameraTransform;
     public float mouseSensitivity = 2f;
     public float pitchMin = -40f;
     public float pitchMax = 60f;
 
-    private CharacterController _cc;
-    private Animator            _anim;
-    private PlayerCombat        _combat;
-    private Vector3             _velocity;
-    private bool                _isGrounded;
-    private float               _pitch = 0f;
+    CharacterController cc;
+    Animator anim;
+    PlayerCombat combat;
+    Vector3 velocity;
+    bool grounded;
+    float pitch;
 
-    private static readonly int HashSpeed    = Animator.StringToHash("Speed");
-    private static readonly int HashGrounded = Animator.StringToHash("IsGrounded");
-    private static readonly int HashJump     = Animator.StringToHash("Jump");
+    static readonly int HashSpeed = Animator.StringToHash("Speed");
+    static readonly int HashGrounded = Animator.StringToHash("IsGrounded");
+    static readonly int HashJump = Animator.StringToHash("Jump");
 
-    private void Awake()
+    void Awake()
     {
-        _cc     = GetComponent<CharacterController>();
-        _anim   = GetComponent<Animator>();
-        _combat = GetComponent<PlayerCombat>();
-
+        cc = GetComponent<CharacterController>();
+        anim = GetComponent<Animator>();
+        combat = GetComponent<PlayerCombat>();
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible   = false;
+        Cursor.visible = false;
     }
 
-    private void Update()
+    void Update()
     {
         MouseLook();
         GroundCheck();
@@ -47,60 +42,49 @@ public class PlayerController : MonoBehaviour
         ApplyGravity();
     }
 
-    private void MouseLook()
+    void MouseLook()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
-
-        // Rotate player left/right
-        transform.Rotate(Vector3.up * mouseX);
-
-        // Rotate camera up/down only
-        _pitch -= mouseY;
-        _pitch  = Mathf.Clamp(_pitch, pitchMin, pitchMax);
-
+        float mx = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float my = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        transform.Rotate(Vector3.up * mx);
+        pitch -= my;
+        pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
         if (cameraTransform != null)
-            cameraTransform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
+            cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
-    private void GroundCheck()
+    void GroundCheck()
     {
-        _isGrounded = _cc.isGrounded;
-        if (_isGrounded && _velocity.y < 0f)
-            _velocity.y = -4f;
-
-        _anim.SetBool(HashGrounded, _isGrounded);
+        grounded = cc.isGrounded;
+        if (grounded && velocity.y < 0f) velocity.y = -4f;
+        anim.SetBool(HashGrounded, grounded);
     }
 
-    private void Move()
+    void Move()
     {
-        if (_combat != null && _combat.IsAttacking) return;
+        if (combat != null && combat.IsAttacking) return;
 
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
-
         Vector3 move = transform.right * h + transform.forward * v;
         if (move.magnitude > 1f) move.Normalize();
 
-        bool running  = Input.GetKey(KeyCode.LeftShift);
-        float speed   = running ? runSpeed : walkSpeed;
+        bool running = Input.GetKey(KeyCode.LeftShift);
+        float speed = running ? runSpeed : walkSpeed;
+        cc.Move(move * speed * Time.deltaTime);
 
-        _cc.Move(move * speed * Time.deltaTime);
-
-        // Jump
-        if (Input.GetButtonDown("Jump") && _isGrounded)
+        if (Input.GetButtonDown("Jump") && grounded)
         {
-            _velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            _anim.SetTrigger(HashJump);
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            anim.SetTrigger(HashJump);
         }
 
-        // Animator
-        _anim.SetFloat(HashSpeed, move.magnitude * (running ? 2f : 1f), 0.1f, Time.deltaTime);
+        anim.SetFloat(HashSpeed, move.magnitude * (running ? 2f : 1f), 0.1f, Time.deltaTime);
     }
 
-    private void ApplyGravity()
+    void ApplyGravity()
     {
-        _velocity.y += gravity * Time.deltaTime;
-        _cc.Move(Vector3.up * _velocity.y * Time.deltaTime);
+        velocity.y += gravity * Time.deltaTime;
+        cc.Move(Vector3.up * velocity.y * Time.deltaTime);
     }
 }

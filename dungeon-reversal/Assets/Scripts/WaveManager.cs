@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,98 +7,81 @@ public class WaveManager : MonoBehaviour
 {
     public static WaveManager Instance { get; private set; }
 
-    [Header("Setup")]
     public GameObject heroPrefab;
     public Transform[] spawnPoints;
-    public int totalWaves = 5;
+    public int totalWaves = 3;
+    public int baseHeroesPerWave = 2;
+    public int heroesPerWaveIncrease = 1;
+    public float timeBetweenWaves = 5f;
+    public float timeBetweenSpawns = 1f;
+    public float startDelay = 2f;
 
-    [Header("Wave Config")]
-    public int   baseHeroesPerWave    = 3;
-    public int   heroesPerWaveIncrease = 1;
-    public float timeBetweenWaves     = 5f;
-    public float timeBetweenSpawns    = 0.8f;
-    public float startDelay           = 2f;
+    public float autoSpawnRadius = 18f;
+    public float autoSpawnMinDist = 12f;
 
-    [Header("Auto Spawn (used when no spawnPoints assigned)")]
-    public float autoSpawnRadius   = 18f;
-    public float autoSpawnMinDist  = 12f;
-
-    [Header("Difficulty Scaling (per wave above 1)")]
-    public float damageScalePerWave    = 0.20f; // +20% dmg per wave
-    public float healthScalePerWave    = 0.25f; // +25% HP per wave
-    public float speedScalePerWave     = 0.12f; // +12% speed per wave
-    public float reactReductionPerWave = 0.18f; // -18% react delay per wave (compounding)
-    public float cooldownReductionPerWave = 0.12f;
-
-    [Header("Scoring")]
     public int scorePerKill = 100;
 
-    public int  CurrentWave   { get; private set; }
-    public int  HeroesAlive   { get; private set; }
-    public bool WaveActive    { get; private set; }
-    public bool AllWavesDone  { get; private set; }
-    public int  Score         { get; private set; }
+    public int CurrentWave { get; private set; }
+    public int HeroesAlive { get; private set; }
+    public bool AllWavesDone { get; private set; }
+    public int Score { get; private set; }
 
     public System.Action<int> OnWaveStart;
     public System.Action<int> OnWaveEnd;
     public System.Action OnAllWavesComplete;
 
-    private List<GameObject> _activeHeroes = new List<GameObject>();
-    private Transform _player;
+    List<GameObject> activeHeroes = new List<GameObject>();
+    Transform player;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
     }
 
-    private void Start()
+    void Start()
     {
         GameObject p = GameObject.FindGameObjectWithTag("Player");
-        if (p != null) _player = p.transform;
+        if (p != null) player = p.transform;
 
         if (heroPrefab == null)
         {
-            Debug.LogWarning("WaveManager: heroPrefab not assigned. Drag the Crusader prefab into the slot.");
+            Debug.LogError("WaveManager: heroPrefab not assigned.");
             return;
         }
 
         StartCoroutine(RunWaves());
     }
 
-    private IEnumerator RunWaves()
+    IEnumerator RunWaves()
     {
         yield return new WaitForSeconds(startDelay);
 
         for (int wave = 1; wave <= totalWaves; wave++)
         {
             CurrentWave = wave;
-            int heroCount = baseHeroesPerWave + (wave - 1) * heroesPerWaveIncrease;
+            int count = baseHeroesPerWave + (wave - 1) * heroesPerWaveIncrease;
 
-            OnWaveStart?.Invoke(wave);
-            WaveActive = true;
-
-            yield return StartCoroutine(SpawnWave(wave, heroCount));
-
+            if (OnWaveStart != null) OnWaveStart(wave);
+            yield return StartCoroutine(SpawnWave(wave, count));
             yield return new WaitUntil(() => HeroesAlive <= 0);
+            if (OnWaveEnd != null) OnWaveEnd(wave);
 
-            WaveActive = false;
-            OnWaveEnd?.Invoke(wave);
-
-            if (wave < totalWaves)
-                yield return new WaitForSeconds(timeBetweenWaves);
+            if (wave < totalWaves) yield return new WaitForSeconds(timeBetweenWaves);
         }
 
         AllWavesDone = true;
-        OnAllWavesComplete?.Invoke();
-        GameManager.Instance?.HeroesRetreated();
+        if (OnAllWavesComplete != null) OnAllWavesComplete();
+        if (GameManager.Instance != null) GameManager.Instance.HeroesRetreated();
     }
 
-    private IEnumerator SpawnWave(int waveNumber, int count)
+    IEnumerator SpawnWave(int waveNumber, int count)
     {
         for (int i = 0; i < count; i++)
         {
-            Vector3 pos; Quaternion rot;
+            Vector3 pos;
+            Quaternion rot;
+
             if (spawnPoints != null && spawnPoints.Length > 0)
             {
                 Transform pt = spawnPoints[Random.Range(0, spawnPoints.Length)];
@@ -107,13 +91,12 @@ public class WaveManager : MonoBehaviour
             else
             {
                 pos = GetAutoSpawnPosition();
-                rot = Quaternion.LookRotation(_player != null
-                    ? (_player.position - pos).normalized
-                    : Vector3.forward);
+                rot = Quaternion.LookRotation(player != null ? (player.position - pos).normalized : Vector3.forward);
             }
 
             GameObject hero = Instantiate(heroPrefab, pos, rot);
-            _activeHeroes.Add(hero);
+            if (!hero.activeSelf) hero.SetActive(true);
+            activeHeroes.Add(hero);
             HeroesAlive++;
 
             HeroAI ai = hero.GetComponent<HeroAI>();
@@ -123,12 +106,30 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    private Vector3 GetAutoSpawnPosition()
+    Vector3 GetAutoSpawnPosition()
     {
-        Vector3 center = _player != null ? _player.position : transform.position;
-        float angle = Random.Range(0f, Mathf.PI * 2f);
-        float dist  = Random.Range(autoSpawnMinDist, autoSpawnRadius);
-        return center + new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+        Vector3 center = player != null ? player.position : transform.position;
+
+        NavMeshHit centerHit;
+        if (NavMesh.SamplePosition(center, out centerHit, 20f, NavMesh.AllAreas))
+            center = centerHit.position;
+
+        for (int i = 0; i < 20; i++)
+        {
+            float angle = Random.Range(0f, Mathf.PI * 2f);
+            float dist = Random.Range(autoSpawnMinDist, autoSpawnRadius);
+            Vector3 candidate = center + new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+
+            NavMeshHit hit;
+            if (!NavMesh.SamplePosition(candidate, out hit, 3f, NavMesh.AllAreas)) continue;
+
+            NavMeshPath path = new NavMeshPath();
+            if (NavMesh.CalculatePath(hit.position, center, NavMesh.AllAreas, path)
+                && path.status == NavMeshPathStatus.PathComplete)
+                return hit.position;
+        }
+
+        return center;
     }
 
     public void HeroKilled()
@@ -136,10 +137,4 @@ public class WaveManager : MonoBehaviour
         HeroesAlive = Mathf.Max(0, HeroesAlive - 1);
         Score += scorePerKill * Mathf.Max(1, CurrentWave);
     }
-
-    public float GetDamageScale(int wave)   => 1f + (wave - 1) * damageScalePerWave;
-    public float GetHealthScale(int wave)   => 1f + (wave - 1) * healthScalePerWave;
-    public float GetSpeedScale(int wave)    => 1f + (wave - 1) * speedScalePerWave;
-    public float GetReactScale(int wave)    => Mathf.Pow(1f - reactReductionPerWave, wave - 1);
-    public float GetCooldownScale(int wave) => Mathf.Pow(1f - cooldownReductionPerWave, wave - 1);
 }

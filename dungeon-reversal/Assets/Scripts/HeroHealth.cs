@@ -1,31 +1,23 @@
 using UnityEngine;
 
-/// <summary>
-/// HeroHealth.cs
-/// Dungeon Reversal - Health component for the Crusader hero NPC.
-/// Notifies HeroAI on death and reports kill to WaveManager.
-/// Attach to same GameObject as HeroAI.
-/// </summary>
 public class HeroHealth : MonoBehaviour
 {
-    [Header("Health")]
     public float maxHealth = 100f;
     public float currentHealth { get; private set; }
 
-    [Header("Feedback")]
     public AudioClip hitClip;
     public AudioClip deathClip;
     public GameObject deathVFX;
 
-    private HeroAI      _ai;
-    private AudioSource _audio;
-    private bool        _isDead;
+    HeroAI ai;
+    AudioSource audioSrc;
+    bool isDead;
 
-    private void Awake()
+    void Awake()
     {
-        _ai    = GetComponent<HeroAI>();
-        _audio = GetComponent<AudioSource>();
-        if (_audio == null) _audio = gameObject.AddComponent<AudioSource>();
+        ai = GetComponent<HeroAI>();
+        audioSrc = GetComponent<AudioSource>();
+        if (audioSrc == null) audioSrc = gameObject.AddComponent<AudioSource>();
         currentHealth = maxHealth;
     }
 
@@ -36,24 +28,18 @@ public class HeroHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (_isDead) return;
-
+        if (isDead) return;
         currentHealth = Mathf.Max(0f, currentHealth - amount);
-
-        if (_audio != null && hitClip != null)
-            _audio.PlayOneShot(hitClip);
-
-        if (currentHealth <= 0f)
-            Die();
+        if (audioSrc != null && hitClip != null) audioSrc.PlayOneShot(hitClip);
+        if (currentHealth <= 0f) Die();
     }
 
-    private void Die()
+    void Die()
     {
-        if (_isDead) return;
-        _isDead = true;
+        if (isDead) return;
+        isDead = true;
 
-        if (_audio != null && deathClip != null)
-            _audio.PlayOneShot(deathClip);
+        if (audioSrc != null && deathClip != null) audioSrc.PlayOneShot(deathClip);
 
         if (deathVFX != null)
         {
@@ -61,10 +47,7 @@ public class HeroHealth : MonoBehaviour
             Destroy(vfx, 3f);
         }
 
-        // Report kill to WaveManager
-        WaveManager.Instance?.HeroKilled();
-
-        // Tell AI to play death animation
-        if (_ai != null) _ai.OnDeath();
+        if (WaveManager.Instance != null) WaveManager.Instance.HeroKilled();
+        if (ai != null) ai.OnDeath();
     }
 }

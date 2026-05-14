@@ -2,107 +2,85 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-/// <summary>
-/// GameManager.cs
-/// Dungeon Reversal - Central game state controller.
-/// Handles win/lose conditions, scene transitions, pause.
-/// Place on a persistent GameObject in the scene.
-/// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("Scenes")]
     public string mainMenuScene = "MainMenu";
-    public string nextLevelScene = "";  // set per level
+    public string gameOverScene = "GameOverScene";
+    public string victoryScene = "VictoryScene";
+    public string nextLevelScene = "";
 
-    [Header("UI Panels — assign in Inspector")]
     public GameObject pauseMenuPanel;
-    public GameObject gameOverPanel;
-    public GameObject victoryPanel;
     public GameObject hudPanel;
 
-    [Header("Timing")]
     public float gameOverDelay = 2f;
-    public float victoryDelay  = 2f;
+    public float victoryDelay = 2f;
 
-    // State
-    public bool IsPaused   { get; private set; }
+    public bool IsPaused { get; private set; }
     public bool IsGameOver { get; private set; }
 
-    private void Awake()
+    void Awake()
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
+        Time.timeScale = 1f;
     }
 
-    private void Start()
+    void Start()
     {
         Time.timeScale = 1f;
-        SetPanels(hud: true, pause: false, over: false, victory: false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+        if (hudPanel != null) hudPanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
-        // Subscribe to player death
         PlayerHealth ph = FindObjectOfType<PlayerHealth>();
         if (ph != null) ph.OnDeath += () => StartCoroutine(TriggerGameOver());
 
-        // Subscribe to all waves cleared
         WaveManager wm = FindObjectOfType<WaveManager>();
         if (wm != null) wm.OnAllWavesComplete += () => StartCoroutine(TriggerVictory());
     }
 
-    private void Update()
+    void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && !IsGameOver)
-            TogglePause();
+        if (Input.GetKeyDown(KeyCode.Escape) && !IsGameOver) TogglePause();
     }
 
-    // ── Pause ──────────────────────────────────────────────────
     public void TogglePause()
     {
         IsPaused = !IsPaused;
         Time.timeScale = IsPaused ? 0f : 1f;
-        SetPanels(hud: !IsPaused, pause: IsPaused, over: false, victory: false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(IsPaused);
+        if (hudPanel != null) hudPanel.SetActive(!IsPaused);
         Cursor.lockState = IsPaused ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible   = IsPaused;
+        Cursor.visible = IsPaused;
     }
 
-    public void Resume() => TogglePause();
+    public void Resume() { TogglePause(); }
+    public void HeroesRetreated() { StartCoroutine(TriggerVictory()); }
+    public void BossDefeated() { StartCoroutine(TriggerGameOver()); }
 
-    // ── Win / Lose ─────────────────────────────────────────────
-
-    /// <summary>All waves survived — player wins this level.</summary>
-    public void HeroesRetreated()
-    {
-        StartCoroutine(TriggerVictory());
-    }
-
-    /// <summary>Boss HP hit 0 — player loses.</summary>
-    public void BossDefeated()
-    {
-        StartCoroutine(TriggerGameOver());
-    }
-
-    private IEnumerator TriggerGameOver()
+    IEnumerator TriggerGameOver()
     {
         if (IsGameOver) yield break;
         IsGameOver = true;
-        yield return new WaitForSeconds(gameOverDelay);
-        Time.timeScale = 0f;
-        SetPanels(hud: false, pause: false, over: true, victory: false);
+        yield return new WaitForSecondsRealtime(gameOverDelay);
+        Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible   = true;
+        Cursor.visible = true;
+        SceneManager.LoadScene(gameOverScene);
     }
 
-    private IEnumerator TriggerVictory()
+    IEnumerator TriggerVictory()
     {
-        yield return new WaitForSeconds(victoryDelay);
-        Time.timeScale = 0f;
-        SetPanels(hud: false, pause: false, over: false, victory: true);
+        yield return new WaitForSecondsRealtime(victoryDelay);
+        Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible   = true;
+        Cursor.visible = true;
+        SceneManager.LoadScene(victoryScene);
     }
 
-    // ── Button Callbacks (hook to UI buttons) ──────────────────
     public void RestartLevel()
     {
         Time.timeScale = 1f;
@@ -118,23 +96,8 @@ public class GameManager : MonoBehaviour
     public void LoadNextLevel()
     {
         Time.timeScale = 1f;
-        if (!string.IsNullOrEmpty(nextLevelScene))
-            SceneManager.LoadScene(nextLevelScene);
-        else
-            Debug.LogWarning("GameManager: No next level scene assigned!");
+        if (!string.IsNullOrEmpty(nextLevelScene)) SceneManager.LoadScene(nextLevelScene);
     }
 
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
-
-    // ── Helpers ────────────────────────────────────────────────
-    private void SetPanels(bool hud, bool pause, bool over, bool victory)
-    {
-        if (hudPanel     != null) hudPanel.SetActive(hud);
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(pause);
-        if (gameOverPanel  != null) gameOverPanel.SetActive(over);
-        if (victoryPanel   != null) victoryPanel.SetActive(victory);
-    }
+    public void QuitGame() { Application.Quit(); }
 }
