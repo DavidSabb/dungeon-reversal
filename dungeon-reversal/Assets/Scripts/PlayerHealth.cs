@@ -59,6 +59,13 @@ public class PlayerHealth : MonoBehaviour
         OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
     }
 
+    public void ResetToFull()
+    {
+        if (IsDead) return;
+        CurrentHealth = maxHealth;
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
+    }
+
     void TriggerPhase2()
     {
         IsPhase2 = true;

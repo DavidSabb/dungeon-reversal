@@ -14,8 +14,8 @@ public class HeroAI : MonoBehaviour
     public float moveSpeed = 4f;
     public float sightRange = 25f;
     public float attackRange = 3f;
-    public float damage = 15f;
-    public float attackCooldown = 1.5f;
+    public float damage = 8f;
+    public float attackCooldown = 2f;
 
     [Header("Patrol")]
     public Transform[] patrolPoints;
@@ -174,16 +174,16 @@ public class HeroAI : MonoBehaviour
 
     public void SetWaveScaling(int waveNumber)
     {
-        damage *= 1f + (waveNumber - 1) * 0.45f;
-        moveSpeed *= 1f + (waveNumber - 1) * 0.20f;
-        attackCooldown *= Mathf.Pow(0.85f, waveNumber - 1);
+        damage *= 1f + (waveNumber - 1) * 0.10f;
+        moveSpeed *= 1f + (waveNumber - 1) * 0.05f;
+        attackCooldown *= Mathf.Pow(0.95f, waveNumber - 1);
 
         if (agent != null) agent.speed = moveSpeed;
 
         HeroHealth hp = GetComponent<HeroHealth>();
         if (hp != null)
         {
-            hp.maxHealth *= 1f + (waveNumber - 1) * 0.55f;
+            hp.maxHealth *= 1f + (waveNumber - 1) * 0.15f;
             hp.SendMessage("ResetToMax", SendMessageOptions.DontRequireReceiver);
         }
     }

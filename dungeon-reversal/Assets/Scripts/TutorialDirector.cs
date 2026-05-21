@@ -36,6 +36,9 @@ public class TutorialDirector : MonoBehaviour
 
     void OnWaveStart(int wave)
     {
+        PlayerHealth ph = FindObjectOfType<PlayerHealth>();
+        if (ph != null) ph.ResetToFull();
+
         Color c = wave == 1 ? wave1Color : wave == 2 ? wave2Color : wave3Color;
         string sub = "";
         if (wave == 1) sub = "The scouts arrive";
