@@ -51,8 +51,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  hitClip: {fileID: 0}
-  deathClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: c124e05cabc022b449a61f6a1790533a, type: 3}
+  deathClip: {fileID: 8300000, guid: 8ba03847783833c48ba89db318995310, type: 3}
   deathVFX: {fileID: 0}
 --- !u!195 &1050215542543340357
 NavMeshAgent:
@@ -109,32 +109,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 371485b489386604a944c8927149d619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 4
   sightRange: 15
   attackRange: 2
+  damage: 8
+  attackCooldown: 2
   patrolPoints: []
-  patrolWaitTime: 2
-  baseDamage: 15
-  baseReactionDelay: 1.5
-  baseAttackCooldown: 1.8
   attackClip: {fileID: 0}
-  hitVFX: {fileID: 0}
---- !u!114 &9001234567890123456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1362561404329566954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a8b3c5d9e1f4a6b2c8d0e5f3a7b9c1d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  offset: {x: 0, y: 2.4, z: 0}
-  size: {x: 1.2, y: 0.15}
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0.65}
-  fillColor: {r: 0.85, g: 0.15, b: 0.15, a: 1}
-  hideWhenFull: 0
 --- !u!136 &7425180819083919982
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -158,6 +139,23 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &9001234567890123456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362561404329566954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8b3c5d9e1f4a6b2c8d0e5f3a7b9c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: 2.4, z: 0}
+  size: {x: 1.2, y: 0.15}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.65}
+  fillColor: {r: 0.85, g: 0.15, b: 0.15, a: 1}
+  hideWhenFull: 0
 --- !u!1001 &4103554414962379513
 PrefabInstance:
   m_ObjectHideFlags: 0
