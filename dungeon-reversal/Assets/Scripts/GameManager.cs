@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenuPanel;
     public GameObject hudPanel;
 
-    public float gameOverDelay = 2f;
-    public float victoryDelay = 2f;
+    const float gameOverDelay = 2f;
+    const float victoryDelay = 2f;
 
     public bool IsPaused { get; private set; }
     public bool IsGameOver { get; private set; }
@@ -34,12 +34,6 @@ public class GameManager : MonoBehaviour
         if (hudPanel != null) hudPanel.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        PlayerHealth ph = FindObjectOfType<PlayerHealth>();
-        if (ph != null) ph.OnDeath += () => StartCoroutine(TriggerGameOver());
-
-        WaveManager wm = FindObjectOfType<WaveManager>();
-        if (wm != null) wm.OnAllWavesComplete += () => StartCoroutine(TriggerVictory());
     }
 
     void Update()

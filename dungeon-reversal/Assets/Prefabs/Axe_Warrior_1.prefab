@@ -689,7 +689,6 @@ MonoBehaviour:
   maxHealth: 100
   hitClip: {fileID: 8300000, guid: c124e05cabc022b449a61f6a1790533a, type: 3}
   deathClip: {fileID: 8300000, guid: 8ba03847783833c48ba89db318995310, type: 3}
-  deathVFX: {fileID: 0}
 --- !u!136 &604984577778922256
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -726,12 +725,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 4
-  sightRange: 25
-  attackRange: 3
   damage: 8
   attackCooldown: 2
-  patrolPoints: []
-  attackClip: {fileID: 0}
+  attackClip: {fileID: 8300000, guid: c124e05cabc022b449a61f6a1790533a, type: 3}
 --- !u!114 &2655081331401095691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -744,11 +740,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8b3c5d9e1f4a6b2c8d0e5f3a7b9c1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 2.4, z: 0}
-  size: {x: 1.2, y: 0.15}
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0.65}
-  fillColor: {r: 0.85, g: 0.15, b: 0.15, a: 1}
-  hideWhenFull: 0
 --- !u!82 &6160026075122860958
 AudioSource:
   m_ObjectHideFlags: 0

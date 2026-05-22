@@ -3449,12 +3449,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 5
   runSpeed: 10
-  gravity: -20
   jumpHeight: 2
   cameraTransform: {fileID: 5640632081643062360}
-  mouseSensitivity: 2
-  pitchMin: -40
-  pitchMax: 60
 --- !u!114 &7075466303626856273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3468,25 +3464,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meleeDamage: 40
-  meleeRange: 2.5
+  special1Damage: 60
+  special2Damage: 80
+  special1Cooldown: 5
+  special2Cooldown: 10
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
-  enemyTag: Hero
   weaponTip: {fileID: 4515639280212732}
-  weaponHitRadius: 3.5
-  special1Damage: 60
-  special1Range: 5
-  special1Cooldown: 5
-  special1VFX: {fileID: 0}
-  special2Damage: 80
-  special2Range: 7
-  special2Cooldown: 10
-  special2VFX: {fileID: 0}
-  hitVFX: {fileID: 0}
-  meleeSwingClip: {fileID: 0}
-  special1Clip: {fileID: 0}
-  special2Clip: {fileID: 0}
+  meleeSwingClip: {fileID: 8300000, guid: 3053b4611433e9345a7e28acb57c8f5d, type: 3}
+  special1Clip: {fileID: 8300000, guid: 4f82c1a9a1d9d9945a18239fcef5c3de, type: 3}
+  special2Clip: {fileID: 8300000, guid: 4f82c1a9a1d9d9945a18239fcef5c3de, type: 3}
 --- !u!114 &178753973255652419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3500,11 +3488,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 300
-  phase2Threshold: 0.5
-  phase2SpeedBonus: 1.5
-  phase2DamageBonus: 1.3
-  deathDelay: 2
-  deathClip: {fileID: 0}
+  deathClip: {fileID: 8300000, guid: 3cdb61b59044dbd4e86ac53f5533f342, type: 3}
 --- !u!82 &7921406917125709208
 AudioSource:
   m_ObjectHideFlags: 0

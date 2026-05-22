@@ -5,41 +5,33 @@ using System.Collections;
 public class PlayerCombat : MonoBehaviour
 {
     public float meleeDamage = 40f;
-    public float meleeRange = 2.5f;
-    public LayerMask enemyLayer;
-    public string enemyTag = "Hero";
-
-    public Transform weaponTip;
-    public float weaponHitRadius = 3.5f;
-
     public float special1Damage = 60f;
-    public float special1Range = 5f;
-    public float special1Cooldown = 5f;
-    public GameObject special1VFX;
-
     public float special2Damage = 80f;
-    public float special2Range = 7f;
+    public float special1Cooldown = 5f;
     public float special2Cooldown = 10f;
-    public GameObject special2VFX;
 
-    public GameObject hitVFX;
+    public LayerMask enemyLayer;
+    public Transform weaponTip;
+
     public AudioClip meleeSwingClip;
     public AudioClip special1Clip;
     public AudioClip special2Clip;
+
+    const string enemyTag = "Hero";
+    const float meleeRange = 2.5f;
+    const float weaponHitRadius = 3.5f;
+    const float special1Range = 5f;
+    const float special2Range = 7f;
 
     float sp1Timer;
     float sp2Timer;
 
     public bool IsAttacking { get; private set; }
-    public float Special1Current => sp1Timer;
-    public float Special2Current => sp2Timer;
+    public float Special1Current { get { return sp1Timer; } }
+    public float Special2Current { get { return sp2Timer; } }
 
     Animator anim;
     AudioSource audioSrc;
-
-    static readonly int HashAttack = Animator.StringToHash("Attack");
-    static readonly int HashSpecial1 = Animator.StringToHash("Special1");
-    static readonly int HashSpecial2 = Animator.StringToHash("Special2");
 
     void Awake()
     {
@@ -62,7 +54,7 @@ public class PlayerCombat : MonoBehaviour
     IEnumerator DoMelee()
     {
         IsAttacking = true;
-        anim.SetTrigger(HashAttack);
+        anim.SetTrigger("Attack");
         PlaySound(meleeSwingClip);
         yield return new WaitForSeconds(0.45f);
         HitAtWeapon(meleeDamage);
@@ -74,10 +66,9 @@ public class PlayerCombat : MonoBehaviour
     {
         IsAttacking = true;
         sp1Timer = special1Cooldown;
-        anim.SetTrigger(HashSpecial1);
+        anim.SetTrigger("Special1");
         PlaySound(special1Clip);
         yield return new WaitForSeconds(0.5f);
-        SpawnVFX(special1VFX, transform.position);
         HitInRadius(special1Damage, special1Range);
         yield return new WaitForSeconds(0.8f);
         IsAttacking = false;
@@ -87,10 +78,9 @@ public class PlayerCombat : MonoBehaviour
     {
         IsAttacking = true;
         sp2Timer = special2Cooldown;
-        anim.SetTrigger(HashSpecial2);
+        anim.SetTrigger("Special2");
         PlaySound(special2Clip);
         yield return new WaitForSeconds(0.7f);
-        SpawnVFX(special2VFX, transform.position);
         HitInRadius(special2Damage, special2Range);
         yield return new WaitForSeconds(0.9f);
         IsAttacking = false;
@@ -117,13 +107,6 @@ public class PlayerCombat : MonoBehaviour
     {
         HeroHealth hp = col.GetComponent<HeroHealth>();
         if (hp != null) hp.TakeDamage(dmg);
-        SpawnVFX(hitVFX, col.transform.position);
-    }
-
-    void SpawnVFX(GameObject prefab, Vector3 pos)
-    {
-        if (prefab == null) return;
-        Destroy(Instantiate(prefab, pos, Quaternion.identity), 3f);
     }
 
     void PlaySound(AudioClip clip)

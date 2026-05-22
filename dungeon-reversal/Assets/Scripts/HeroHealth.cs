@@ -7,7 +7,6 @@ public class HeroHealth : MonoBehaviour
 
     public AudioClip hitClip;
     public AudioClip deathClip;
-    public GameObject deathVFX;
 
     HeroAI ai;
     AudioSource audioSrc;
@@ -40,12 +39,6 @@ public class HeroHealth : MonoBehaviour
         isDead = true;
 
         if (audioSrc != null && deathClip != null) audioSrc.PlayOneShot(deathClip);
-
-        if (deathVFX != null)
-        {
-            GameObject vfx = Instantiate(deathVFX, transform.position, Quaternion.identity);
-            Destroy(vfx, 3f);
-        }
 
         if (WaveManager.Instance != null) WaveManager.Instance.HeroKilled();
         if (ai != null) ai.OnDeath();

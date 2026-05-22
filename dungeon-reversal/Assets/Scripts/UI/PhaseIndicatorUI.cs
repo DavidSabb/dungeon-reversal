@@ -4,25 +4,24 @@ using TMPro;
 public class PhaseIndicatorUI : MonoBehaviour
 {
     public TextMeshProUGUI label;
-    public string phase1Text = "";
-    public string phase2Text = "ENRAGED";
+
+    const string phase1Text = "";
+    const string phase2Text = "ENRAGED";
 
     PlayerHealth health;
 
     void Start()
     {
         health = FindObjectOfType<PlayerHealth>();
-        if (label != null) label.text = phase1Text;
-        if (health != null) health.OnPhase2Begin += ShowPhase2;
     }
 
-    void OnDestroy()
+    void Update()
     {
-        if (health != null) health.OnPhase2Begin -= ShowPhase2;
-    }
+        if (health == null || label == null) return;
 
-    void ShowPhase2()
-    {
-        if (label != null) label.text = phase2Text;
+        if (health.IsPhase2)
+            label.text = phase2Text;
+        else
+            label.text = phase1Text;
     }
 }

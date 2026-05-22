@@ -4,11 +4,11 @@ using UnityEngine.UI;
 [RequireComponent(typeof(HeroHealth))]
 public class HeroHealthBar : MonoBehaviour
 {
-    public Vector3 offset = new Vector3(0f, 2.4f, 0f);
-    public Vector2 size = new Vector2(1.2f, 0.15f);
-    public Color backgroundColor = new Color(0f, 0f, 0f, 0.65f);
-    public Color fillColor = new Color(0.85f, 0.15f, 0.15f, 1f);
-    public bool hideWhenFull = false;
+    readonly Vector3 offset = new Vector3(0f, 2.4f, 0f);
+    readonly Vector2 size = new Vector2(1.2f, 0.15f);
+    readonly Color backgroundColor = new Color(0f, 0f, 0f, 0.65f);
+    readonly Color fillColor = new Color(0.85f, 0.15f, 0.15f, 1f);
+    const bool hideWhenFull = false;
 
     HeroHealth health;
     Canvas canvas;

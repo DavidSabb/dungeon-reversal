@@ -7,8 +7,8 @@ public class LockOnSystem : MonoBehaviour
     public string enemyTag = "Hero";
     public GameObject lockOnIndicatorPrefab;
 
-    public bool HasTarget => currentTarget != null;
-    public Transform CurrentTarget => currentTarget;
+    public bool HasTarget { get { return currentTarget != null; } }
+    public Transform CurrentTarget { get { return currentTarget; } }
 
     Transform currentTarget;
     GameObject indicator;

@@ -7,32 +7,23 @@ using System.Collections;
 [RequireComponent(typeof(HeroHealth))]
 public class HeroAI : MonoBehaviour
 {
-    private enum State { Patrol, Chase, Attack, Dead }
-    private State state = State.Patrol;
+    private enum State { Chase, Attack, Dead }
+    private State state = State.Chase;
 
-    [Header("Stats")]
     public float moveSpeed = 4f;
-    public float sightRange = 25f;
-    public float attackRange = 3f;
     public float damage = 8f;
     public float attackCooldown = 2f;
-
-    [Header("Patrol")]
-    public Transform[] patrolPoints;
-
     public AudioClip attackClip;
+
+    const float sightRange = 25f;
+    const float attackRange = 3f;
 
     private NavMeshAgent agent;
     private Animator anim;
     private AudioSource audioSrc;
     private Transform player;
     private PlayerHealth playerHealth;
-    private int patrolIndex;
     private float attackTimer;
-
-    private static readonly int HashSpeed  = Animator.StringToHash("Speed");
-    private static readonly int HashAttack = Animator.StringToHash("Attack");
-    private static readonly int HashDie    = Animator.StringToHash("Die");
 
     void Start()
     {
@@ -48,7 +39,6 @@ public class HeroAI : MonoBehaviour
             agent.Warp(hit.position);
 
         FindPlayer();
-        GotoNextPatrolPoint();
     }
 
     void FindPlayer()
@@ -80,31 +70,17 @@ public class HeroAI : MonoBehaviour
 
         switch (state)
         {
-            case State.Patrol: Patrol(); break;
             case State.Chase:  Chase();  break;
             case State.Attack: Attack(); break;
         }
 
         float speed = Time.deltaTime > 0f ? (transform.position - prev).magnitude / Time.deltaTime : 0f;
-        anim.SetFloat(HashSpeed, speed, 0.1f, Time.deltaTime);
-    }
-
-    void Patrol()
-    {
-        if (player != null)
-        {
-            state = State.Chase;
-            return;
-        }
-
-        if (!agent.isOnNavMesh) return;
-        if (patrolPoints.Length > 0 && !agent.pathPending && agent.remainingDistance < 0.5f)
-            GotoNextPatrolPoint();
+        anim.SetFloat("Speed", speed, 0.1f, Time.deltaTime);
     }
 
     void Chase()
     {
-        if (player == null) { state = State.Patrol; return; }
+        if (player == null) return;
 
         if (agent.isOnNavMesh) agent.SetDestination(player.position);
         else MoveDirectly();
@@ -125,7 +101,7 @@ public class HeroAI : MonoBehaviour
 
     void Attack()
     {
-        if (player == null) { state = State.Patrol; return; }
+        if (player == null) { state = State.Chase; return; }
 
         if (agent.isOnNavMesh) agent.SetDestination(transform.position);
         FacePlayer();
@@ -146,7 +122,7 @@ public class HeroAI : MonoBehaviour
 
     IEnumerator DoAttack()
     {
-        anim.SetTrigger(HashAttack);
+        anim.SetTrigger("Attack");
         if (audioSrc != null && attackClip != null) audioSrc.PlayOneShot(attackClip);
 
         yield return new WaitForSeconds(0.4f);
@@ -157,14 +133,6 @@ public class HeroAI : MonoBehaviour
         {
             playerHealth.TakeDamage(damage);
         }
-    }
-
-    void GotoNextPatrolPoint()
-    {
-        if (patrolPoints.Length == 0) return;
-        if (!agent.isOnNavMesh) return;
-        agent.SetDestination(patrolPoints[patrolIndex].position);
-        patrolIndex = (patrolIndex + 1) % patrolPoints.Length;
     }
 
     void FacePlayer()
@@ -199,7 +167,7 @@ public class HeroAI : MonoBehaviour
     {
         state = State.Dead;
         if (agent != null && agent.enabled) agent.isStopped = true;
-        anim.SetTrigger(HashDie);
+        anim.SetTrigger("Die");
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
         Destroy(gameObject, 3f);

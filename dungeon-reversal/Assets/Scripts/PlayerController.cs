@@ -6,13 +6,13 @@ public class PlayerController : MonoBehaviour
 {
     public float walkSpeed = 5f;
     public float runSpeed = 10f;
-    public float gravity = -20f;
     public float jumpHeight = 2f;
-
     public Transform cameraTransform;
-    public float mouseSensitivity = 2f;
-    public float pitchMin = -40f;
-    public float pitchMax = 60f;
+
+    const float gravity = -20f;
+    const float mouseSensitivity = 2f;
+    const float pitchMin = -40f;
+    const float pitchMax = 60f;
 
     CharacterController cc;
     Animator anim;
@@ -20,10 +20,6 @@ public class PlayerController : MonoBehaviour
     Vector3 velocity;
     bool grounded;
     float pitch;
-
-    static readonly int HashSpeed = Animator.StringToHash("Speed");
-    static readonly int HashGrounded = Animator.StringToHash("IsGrounded");
-    static readonly int HashJump = Animator.StringToHash("Jump");
 
     void Awake()
     {
@@ -57,7 +53,7 @@ public class PlayerController : MonoBehaviour
     {
         grounded = cc.isGrounded;
         if (grounded && velocity.y < 0f) velocity.y = -4f;
-        anim.SetBool(HashGrounded, grounded);
+        anim.SetBool("IsGrounded", grounded);
     }
 
     void Move()
@@ -76,10 +72,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && grounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            anim.SetTrigger(HashJump);
+            anim.SetTrigger("Jump");
         }
 
-        anim.SetFloat(HashSpeed, move.magnitude * (running ? 2f : 1f), 0.1f, Time.deltaTime);
+        anim.SetFloat("Speed", move.magnitude * (running ? 2f : 1f), 0.1f, Time.deltaTime);
     }
 
     void ApplyGravity()

@@ -3,15 +3,14 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform target;
-    public Vector3 offset = new Vector3(0f, 2.5f, -5f);
-
-    public float sensitivityX = 3f;
-    public float sensitivityY = 2f;
-    public float minPitch = -20f;
-    public float maxPitch = 60f;
-
-    public float collisionRadius = 0.3f;
     public LayerMask collisionMask;
+
+    readonly Vector3 offset = new Vector3(0f, 2.5f, -5f);
+    const float sensitivityX = 3f;
+    const float sensitivityY = 2f;
+    const float minPitch = -20f;
+    const float maxPitch = 60f;
+    const float collisionRadius = 0.3f;
 
     float yaw;
     float pitch;
