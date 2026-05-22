@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/DesertScene.unity
     guid: 53f5a0914b195b74abc2fb43a9e2ce22
   - enabled: 1
+    path: Assets/Scenes/Castle.unity
+    guid: 2dbfc40c035e5804993c59567904a1c2
+  - enabled: 1
     path: Assets/Scenes/VictoryScene.unity
     guid: 520284130b097234681371274e37034f
   - enabled: 1

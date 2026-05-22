@@ -54,10 +54,18 @@ public class HeroAI : MonoBehaviour
     void FindPlayer()
     {
         GameObject p = GameObject.FindGameObjectWithTag("Player");
-        if (p == null) return;
-        player = p.transform;
-        playerHealth = p.GetComponentInParent<PlayerHealth>();
-        if (playerHealth == null) playerHealth = p.GetComponentInChildren<PlayerHealth>();
+        if (p != null)
+        {
+            player = p.transform;
+            playerHealth = p.GetComponentInParent<PlayerHealth>();
+            if (playerHealth == null) playerHealth = p.GetComponentInChildren<PlayerHealth>();
+        }
+
+        if (playerHealth == null)
+        {
+            playerHealth = FindObjectOfType<PlayerHealth>();
+            if (playerHealth != null) player = playerHealth.transform;
+        }
     }
 
     void Update()
@@ -172,9 +180,9 @@ public class HeroAI : MonoBehaviour
         return player != null && Vector3.Distance(transform.position, player.position) <= sightRange;
     }
 
-    public void SetWaveScaling(int waveNumber)
+    public void SetWaveScaling(int waveNumber, float difficulty)
     {
-        damage *= 1f + (waveNumber - 1) * 0.10f;
+        damage *= (1f + (waveNumber - 1) * 0.10f) * difficulty;
         moveSpeed *= 1f + (waveNumber - 1) * 0.05f;
         attackCooldown *= Mathf.Pow(0.95f, waveNumber - 1);
 
@@ -183,7 +191,7 @@ public class HeroAI : MonoBehaviour
         HeroHealth hp = GetComponent<HeroHealth>();
         if (hp != null)
         {
-            hp.maxHealth *= 1f + (waveNumber - 1) * 0.15f;
+            hp.maxHealth *= (1f + (waveNumber - 1) * 0.15f) * difficulty;
             hp.SendMessage("ResetToMax", SendMessageOptions.DontRequireReceiver);
         }
     }

@@ -20,6 +20,7 @@ public class WaveManager : MonoBehaviour
     public float autoSpawnMinDist = 12f;
 
     public int scorePerKill = 100;
+    public float difficultyMultiplier = 1f;
 
     public int CurrentWave { get; private set; }
     public int HeroesAlive { get; private set; }
@@ -100,7 +101,7 @@ public class WaveManager : MonoBehaviour
             HeroesAlive++;
 
             HeroAI ai = hero.GetComponent<HeroAI>();
-            if (ai != null) ai.SetWaveScaling(waveNumber);
+            if (ai != null) ai.SetWaveScaling(waveNumber, difficultyMultiplier);
 
             yield return new WaitForSeconds(timeBetweenSpawns);
         }
